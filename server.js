@@ -23,8 +23,8 @@ fs.createReadStream('film.csv')
 
 router.get('/', (request, response) => { 
   response.sendFile(path.join(__dirname+'/index.html'));
-  //__dirname : It will resolve to your project folder.
 });
+
 app.get('/api/v1/movies', (request, response) => {
 
 });

@@ -221,14 +221,46 @@ const mockMovies = [
   '*Image': 'NicholasCage.png' }
 ]
 
+
+const createMovie = (knex) => {
+  const director = mockMovies.map(movie => {
+    const name = movie.Director.split(' ')
+    return ({
+      first_name: name[0], last_name: name[1]
+    })
+  })
+  return knex('directors').insert({
+    director
+  }, 'id')
+  .then(directorId => {
+    let moviePromises = [];
+    mockMovies.map(movie => {
+      const { ...noDirector } = movie;
+      moviePromises.push(
+        createMovie(knex, {
+          ...noDirector,
+          director_id: directors
+        })
+      )
+    })
+  })
+}
 exports.seed = function(knex) {
   return knex('movies').del()
     .then(() => knex('directors').del())
     .then(() => {
       return Promise.all([
         knex('directors').insert([
+          mockMovies.map(movie => {
+            const name = movie.Director.split(' ')
+            return ({
+              first_name: name[0], last_name: name[1]
+            })
+          })
+        ], 'id')
+        .then(movie => {
 
-        ])
+        })
       ])
     })
 };

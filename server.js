@@ -2,7 +2,7 @@ const express = require('express')
 const app = express();
 const path = require('path');
 const router = express.Router();
-
+const environmgent = process.env.NODE_ENV || 'development';
 
 const csv = require('csv-parser');
 const fs = require('fs')

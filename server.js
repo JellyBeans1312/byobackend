@@ -2,6 +2,9 @@ const express = require('express')
 const app = express();
 const path = require('path');
 const router = express.Router();
+const environment = process.env.NODE_ENV || 'development';
+const configuration = require('./knexfile')[environment];
+const database = require('knex')(configuration);
 
 
 const csv = require('csv-parser');
@@ -17,14 +20,14 @@ fs.createReadStream('film.csv')
 .pipe(csv())
 .on('data', (data) => results.push(data))
 .on('end', () => {
-  // console.log(results); 
+  console.log(results); 
 })
 
 
 router.get('/', (request, response) => { 
   response.sendFile(path.join(__dirname+'/index.html'));
-  //__dirname : It will resolve to your project folder.
 });
+
 app.get('/api/v1/movies', (request, response) => {
 
 });

@@ -222,45 +222,42 @@ const mockMovies = [
 ]
 
 
-const createMovie = (knex) => {
-  const director = mockMovies.map(movie => {
-    const name = movie.Director.split(' ')
-    return ({
-      first_name: name[0], last_name: name[1]
-    })
-  })
+const createDirector = (knex, movie) => {
+
+  const name = movie.Director.split(' ')
   return knex('directors').insert({
-    director
+    first_name: name[1], last_name: name[0]
   }, 'id')
   .then(directorId => {
     let moviePromises = [];
-    mockMovies.map(movie => {
-      const { ...noDirector } = movie;
       moviePromises.push(
         createMovie(knex, {
-          ...noDirector,
-          director_id: directors
+          title: movie.Title,
+          year: movie.Year,
+          actor: movie.Actor,
+          actress: movie.Actress,
+          genre: movie.Subject,
+          directors_id: directorId[0]
         })
       )
-    })
+    return Promise.all(moviePromises)
   })
 }
+
+const createMovie = (knex, movie) => {
+  return knex('movies').insert(movie)
+}
+
 exports.seed = function(knex) {
   return knex('movies').del()
     .then(() => knex('directors').del())
     .then(() => {
-      return Promise.all([
-        knex('directors').insert([
-          mockMovies.map(movie => {
-            const name = movie.Director.split(' ')
-            return ({
-              first_name: name[0], last_name: name[1]
-            })
-          })
-        ], 'id')
-        .then(movie => {
+      let moviePromises = [];
 
-        })
-      ])
+      mockMovies.forEach(movie => {
+        moviePromises.push(createDirector(knex, movie));
+      });
+
+      return Promise.all(moviePromises);
     })
 };
